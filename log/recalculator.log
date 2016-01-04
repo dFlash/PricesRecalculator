@@ -1,0 +1,22 @@
+00:14:22 [main]  INFO MainRecalculator - Recalculation started
+00:14:22 [main]  INFO MainRecalculator - Recalculation started
+00:14:22 [main]  INFO Context - Loading context dbContext.xml
+00:14:22 [main]  INFO Context - Loading context dbContext.xml
+00:14:23 [main]  INFO Version - HCANN000001: Hibernate Commons Annotations {4.0.1.Final}
+00:14:23 [main]  INFO Version - HHH000412: Hibernate Core {4.1.9.Final}
+00:14:23 [main]  INFO Environment - HHH000206: hibernate.properties not found
+00:14:23 [main]  INFO Environment - HHH000021: Bytecode provider name : javassist
+00:14:23 [main]  WARN RootClass - HHH000038: Composite-id class does not override equals(): net.mpopov.ci.cruise.model.CruisePriceInfo
+00:14:23 [main]  WARN RootClass - HHH000039: Composite-id class does not override hashCode(): net.mpopov.ci.cruise.model.CruisePriceInfo
+00:14:23 [main]  WARN RootClass - HHH000038: Composite-id class does not override equals(): net.mpopov.ci.cruise.model.CruiseDateRangeMinPriceInfo
+00:14:23 [main]  WARN RootClass - HHH000039: Composite-id class does not override hashCode(): net.mpopov.ci.cruise.model.CruiseDateRangeMinPriceInfo
+00:14:24 [main]  INFO Dialect - HHH000400: Using dialect: org.hibernate.dialect.PostgreSQLDialect
+00:14:24 [main]  INFO LobCreatorBuilder - HHH000424: Disabling contextual LOB creation as createClob() method threw error : java.lang.reflect.InvocationTargetException
+00:14:24 [main]  INFO TransactionFactoryInitiator - HHH000399: Using default transaction strategy (direct JDBC transactions)
+00:14:24 [main]  INFO ASTQueryTranslatorFactory - HHH000397: Using ASTQueryTranslatorFactory
+00:14:24 [main]  INFO Version - Hibernate Validator 4.1.0.Final
+00:14:24 [main]  INFO DefaultTraversableResolver - Instantiated an instance of org.hibernate.validator.engine.resolver.JPATraversableResolver.
+00:14:24 [main]  INFO DefaultTraversableResolver - Instantiated an instance of org.hibernate.validator.engine.resolver.JPATraversableResolver.
+00:14:24 [main]  INFO HibernateTransactionManager - Using DataSource [org.apache.commons.dbcp.BasicDataSource@3fe2afac] of Hibernate SessionFactory for HibernateTransactionManager
+00:15:08 [main]  INFO MainRecalculator - Recalculation finished
+00:15:08 [main]  INFO MainRecalculator - Recalculation finished
