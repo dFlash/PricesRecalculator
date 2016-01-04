@@ -17,9 +17,9 @@ public class CurrencyExchangeRateLogServiceImpl implements CurrencyExchangeRateL
     private CurrencyExchangeRateLogDAO currencyExchangeRateLogDAO;
 
     @Transactional
-    public void add(CurrencyExchangeRateLog currencyExchangeRate)
+    public void add(CurrencyExchangeRateLog currencyExchangeRateLog)
     {
-        // TODO Auto-generated method stub
+        currencyExchangeRateLogDAO.add(currencyExchangeRateLog);
         
     }
 
@@ -43,10 +43,10 @@ public class CurrencyExchangeRateLogServiceImpl implements CurrencyExchangeRateL
         return currencyExchangeRateLogDAO.list();
     }
 
+    @Transactional
     public void removeAll()
     {
-        // TODO Auto-generated method stub
-        
+        currencyExchangeRateLogDAO.removeAll();
     }
 
 }
