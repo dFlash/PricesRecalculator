@@ -42,10 +42,9 @@ public class CruisePriceInfo implements Serializable
     private Long cabinId;
 
     @Id
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "currency_id")
+    @Column(name = "currency_id")
     @NotNull
-    private Currency currency;
+    private Long currencyId;
 
     @Column(name = "cruise_price_id")
     @NotNull
@@ -205,21 +204,14 @@ public class CruisePriceInfo implements Serializable
         this.cruiseDateRange = cruiseDateRange;
     }
 
-    /**
-     * @return the currency
-     */
-    public Currency getCurrency()
+    public Long getCurrencyId()
     {
-        return currency;
+        return currencyId;
     }
 
-    /**
-     * @param currency
-     *            the currency to set
-     */
-    public void setCurrency(Currency currency)
+    public void setCurrencyId(Long currencyId)
     {
-        this.currency = currency;
+        this.currencyId = currencyId;
     }
 
     /**
@@ -258,8 +250,8 @@ public class CruisePriceInfo implements Serializable
     public String toString()
     {
         return "CruisePriceInfo [dateTime=" + dateTime + ", cruiseDateRange="
-                + cruiseDateRange + ", cabinId=" + cabinId + ", currency="
-                + currency + ", cruisePriceId=" + cruisePriceId
+                + cruiseDateRange + ", cabinId=" + cabinId + ", currencyId="
+                + currencyId + ", cruisePriceId=" + cruisePriceId
                 + ", priceValue=" + priceValue + ", priceValueOne="
                 + priceValueOne + ", priceValueTwo=" + priceValueTwo
                 + ", priceValueThree=" + priceValueThree + ", priceValueFour="

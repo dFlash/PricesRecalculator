@@ -7,12 +7,13 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import net.mpopov.ci.common.CurrencyUtil.EXCHANGE_RATE_SOURCE_TYPE;
 import net.mpopov.ci.cruise.model.CruisePriceInfo;
 
 @Repository
 public class CruisePriceInfoDAOImpl implements CruisePriceInfoDAO
 {
-    
+
     @Autowired
     private SessionFactory sessionFactory;
 
@@ -21,44 +22,50 @@ public class CruisePriceInfoDAOImpl implements CruisePriceInfoDAO
         sessionFactory.getCurrentSession().save(cruisePriceInfo);
     }
 
-    public void remove(Long cruiseDateRangeId, Long cabinId)
+    public void remove(List<Long> cruiseDateRangeIds)
     {
-        String hql = "delete from CruisePriceInfo cruisePriceInfo                  "
-                + "   where cruiseDateRange.cruiseDateRangeId = :cruiseDateRangeId "
-                + "     and cabinId = :cabinId                                     ";
+        if (!cruiseDateRangeIds.isEmpty())
+        {
+            String hql = " delete from CruisePriceInfo  " 
+                    + " where "
+                    + " cruiseDateRange.cruiseDateRangeId in (:ñruiseDateRangeIds)";
+            Query query = sessionFactory.getCurrentSession().createQuery(hql);
+            query.setParameterList("ñruiseDateRangeIds", cruiseDateRangeIds);
+            query.executeUpdate();
+        }
 
-        Query query = sessionFactory.getCurrentSession().createQuery(hql);
-        query.setParameter("cruiseDateRangeId", cruiseDateRangeId);
-        query.setParameter("cabinId", cabinId);
-
-        query.executeUpdate();
     }
 
     @SuppressWarnings("unchecked")
-    public List<CruisePriceInfo> listCbrPrices(
-            List<Long> excludedCompanyIds)
+    public List<Long> listCruiseDateRangeIds(Short sourceType)
     {
-        String hqlTmpl = " from CruisePriceInfo cruisePriceInfo %s                "
-                + " order by cruiseDateRange.cruiseDateRangeId, cabinId, dateTime ";
-
+        String hqlTemplate = " select cruiseDateRange.cruiseDateRangeId from CruiseDateRange cruiseDateRange "
+                + " where "
+                + " cruiseDateRange.cruise.vessel.company.companyId %s";
         String condition = "";
-        if (excludedCompanyIds != null && !excludedCompanyIds.isEmpty())
+        if (sourceType.equals(EXCHANGE_RATE_SOURCE_TYPE.CBR.getSourceType()))
         {
-            condition += " where cruiseDateRangeMinPrice.cruiseDateRange.cruise.vessel.company.companyId "
-                    + "    not in (:excludedCompanyIds)";
+            condition = " not in (:excludedCompanyIds) ";
+        }
+        else
+        {
+            condition = " = :sourceType ";
         }
 
-        String hql = String.format(hqlTmpl, condition);
+        String hql = String.format(hqlTemplate, condition);
 
         Query query = sessionFactory.getCurrentSession().createQuery(hql);
-        if (excludedCompanyIds != null && !excludedCompanyIds.isEmpty())
+        if (sourceType.equals(EXCHANGE_RATE_SOURCE_TYPE.CBR.getSourceType()))
         {
-            query.setParameterList("excludedCompanyIds", excludedCompanyIds);
+            query.setParameterList("excludedCompanyIds",
+                    EXCHANGE_RATE_SOURCE_TYPE.getExcludedCbrCompanyIds());
         }
-
-        List<CruisePriceInfo> cruisesPricesInfo = query.list();
-
-        return cruisesPricesInfo;
+        else
+        {
+            query.setLong("sourceType", sourceType.longValue());
+        }
+        List<Long> cruiseDateRangeIds = query.list();
+        return cruiseDateRangeIds;
     }
 
 }

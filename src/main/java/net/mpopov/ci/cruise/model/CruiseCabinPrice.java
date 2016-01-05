@@ -68,71 +68,87 @@ public class CruiseCabinPrice
     @NotNull
     private Integer pricePortChild;
 
-    public Integer getPriceValueOne() {
-		return priceValueOne;
-	}
+    public Integer getPriceValueOne()
+    {
+        return priceValueOne;
+    }
 
-	public void setPriceValueOne(Integer priceValueOne) {
-		this.priceValueOne = priceValueOne;
-	}
+    public void setPriceValueOne(Integer priceValueOne)
+    {
+        this.priceValueOne = priceValueOne;
+    }
 
-	public Integer getPriceValueTwo() {
-		return priceValueTwo;
-	}
+    public Integer getPriceValueTwo()
+    {
+        return priceValueTwo;
+    }
 
-	public void setPriceValueTwo(Integer priceValueTwo) {
-		this.priceValueTwo = priceValueTwo;
-	}
+    public void setPriceValueTwo(Integer priceValueTwo)
+    {
+        this.priceValueTwo = priceValueTwo;
+    }
 
-	public Integer getPriceValueThree() {
-		return priceValueThree;
-	}
+    public Integer getPriceValueThree()
+    {
+        return priceValueThree;
+    }
 
-	public void setPriceValueThree(Integer priceValueThree) {
-		this.priceValueThree = priceValueThree;
-	}
+    public void setPriceValueThree(Integer priceValueThree)
+    {
+        this.priceValueThree = priceValueThree;
+    }
 
-	public Integer getPriceValueFour() {
-		return priceValueFour;
-	}
+    public Integer getPriceValueFour()
+    {
+        return priceValueFour;
+    }
 
-	public void setPriceValueFour(Integer priceValueFour) {
-		this.priceValueFour = priceValueFour;
-	}
+    public void setPriceValueFour(Integer priceValueFour)
+    {
+        this.priceValueFour = priceValueFour;
+    }
 
-	public Integer getPriceValueAddChild() {
-		return priceValueAddChild;
-	}
+    public Integer getPriceValueAddChild()
+    {
+        return priceValueAddChild;
+    }
 
-	public void setPriceValueAddChild(Integer priceValueAddChild) {
-		this.priceValueAddChild = priceValueAddChild;
-	}
+    public void setPriceValueAddChild(Integer priceValueAddChild)
+    {
+        this.priceValueAddChild = priceValueAddChild;
+    }
 
-	public Integer getPriceValueAdd2Child() {
-		return priceValueAdd2Child;
-	}
+    public Integer getPriceValueAdd2Child()
+    {
+        return priceValueAdd2Child;
+    }
 
-	public void setPriceValueAdd2Child(Integer priceValueAdd2Child) {
-		this.priceValueAdd2Child = priceValueAdd2Child;
-	}
+    public void setPriceValueAdd2Child(Integer priceValueAdd2Child)
+    {
+        this.priceValueAdd2Child = priceValueAdd2Child;
+    }
 
-	public Integer getPricePortAdult() {
-		return pricePortAdult;
-	}
+    public Integer getPricePortAdult()
+    {
+        return pricePortAdult;
+    }
 
-	public void setPricePortAdult(Integer pricePortAdult) {
-		this.pricePortAdult = pricePortAdult;
-	}
+    public void setPricePortAdult(Integer pricePortAdult)
+    {
+        this.pricePortAdult = pricePortAdult;
+    }
 
-	public Integer getPricePortChild() {
-		return pricePortChild;
-	}
+    public Integer getPricePortChild()
+    {
+        return pricePortChild;
+    }
 
-	public void setPricePortChild(Integer pricePortChild) {
-		this.pricePortChild = pricePortChild;
-	}
+    public void setPricePortChild(Integer pricePortChild)
+    {
+        this.pricePortChild = pricePortChild;
+    }
 
-	/**
+    /**
      * @return the cruiseCabinPriceId
      */
     public Long getCruiseCabinPriceId()
@@ -148,8 +164,6 @@ public class CruiseCabinPrice
     {
         this.cruiseCabinPriceId = cruiseCabinPriceId;
     }
-
-
 
     public Long getCabinId()
     {
@@ -195,17 +209,18 @@ public class CruiseCabinPrice
         this.priceValue = priceValue;
     }
 
-	@Override
-	public String toString() {
-		return "CruiseCabinPrice [cruiseCabinPriceId=" + cruiseCabinPriceId
-				+ ", cabinId=" + cabinId + ", cruisePrice=" + cruisePrice
-				+ ", priceValue=" + priceValue + ", priceValueOne="
-				+ priceValueOne + ", priceValueTwo=" + priceValueTwo
-				+ ", priceValueThree=" + priceValueThree + ", priceValueFour="
-				+ priceValueFour + ", priceValueAddChild=" + priceValueAddChild
-				+ ", priceValueAdd2Child=" + priceValueAdd2Child
-				+ ", pricePortAdult=" + pricePortAdult + ", pricePortChild="
-				+ pricePortChild + "]";
-	}
+    @Override
+    public String toString()
+    {
+        return "CruiseCabinPrice [cruiseCabinPriceId=" + cruiseCabinPriceId
+                + ", cabinId=" + cabinId + ", cruisePrice=" + cruisePrice
+                + ", priceValue=" + priceValue + ", priceValueOne="
+                + priceValueOne + ", priceValueTwo=" + priceValueTwo
+                + ", priceValueThree=" + priceValueThree + ", priceValueFour="
+                + priceValueFour + ", priceValueAddChild=" + priceValueAddChild
+                + ", priceValueAdd2Child=" + priceValueAdd2Child
+                + ", pricePortAdult=" + pricePortAdult + ", pricePortChild="
+                + pricePortChild + "]";
+    }
 
 }

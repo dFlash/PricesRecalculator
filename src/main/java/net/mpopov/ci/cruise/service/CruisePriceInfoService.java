@@ -1,11 +1,11 @@
 package net.mpopov.ci.cruise.service;
 
-import java.util.List;
-import java.util.Map;
+import net.mpopov.ci.cruise.model.CruisePriceInfo;
 
 public interface CruisePriceInfoService
 {
-    public void updateRates(Map<Long, Double> rates,
-            List<Long> excludedCompanyIds);
+    public void remove(Short sourceType);
+    
+    public void add(CruisePriceInfo cruisePriceInfo);
 
 }

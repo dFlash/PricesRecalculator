@@ -9,8 +9,7 @@ public interface CruisePriceInfoDAO
 
     public void add(CruisePriceInfo cruisePriceInfo);
 
-    public void remove(Long cruiseDateRangeId, Long cabinId);
+    public void remove(List<Long> cruiseDateRangeIds);
 
-    public List<CruisePriceInfo> listCbrPrices(
-            List<Long> excludedCompanyIds);
+    public List<Long> listCruiseDateRangeIds(Short sourceType);
 }

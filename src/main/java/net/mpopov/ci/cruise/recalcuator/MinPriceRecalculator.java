@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import net.mpopov.ci.common.ContextAdapter;
 import net.mpopov.ci.common.CurrencyUtil;
 import net.mpopov.ci.cruise.model.CruiseDateRangeMinPrice;
@@ -20,6 +22,7 @@ import net.mpopov.ci.cruise.service.CurrencyExchangeRateService;
 
 public class MinPriceRecalculator extends ContextAdapter implements Recalculator
 {
+    private static Logger log = Logger.getLogger(MinPriceRecalculator.class);
 
     private Set<Short> needToRecalculate = new HashSet<Short>();
     
@@ -27,6 +30,7 @@ public class MinPriceRecalculator extends ContextAdapter implements Recalculator
 
     public boolean recalculate()
     {
+        log.info("MinPriceRecalculator started");
         boolean recalculated = false;
         init();
 
@@ -35,23 +39,30 @@ public class MinPriceRecalculator extends ContextAdapter implements Recalculator
             recalculateMinPrices();
             recalculated = true;
         }
+        log.info("MinPriceRecalculator finished");
         return recalculated;
     }
 
     private void recalculateMinPrices()
     {
-        CruiseDateRangeMinPriceInfoService cruiseDateRangeMinPriceInfoService = getBean("cruiseDateRangeMinPriceInfoService");
-        CruiseDateRangeMinPriceService cruiseDateRangeMinPriceService = getBean("cruiseDateRangeMinPriceService");
+        CruiseDateRangeMinPriceInfoService cruiseDateRangeMinPriceInfoService = getBean(
+                "cruiseDateRangeMinPriceInfoService");
+        CruiseDateRangeMinPriceService cruiseDateRangeMinPriceService = getBean(
+                "cruiseDateRangeMinPriceService");
 
         Map<Short, Set<CurrencyExchangeRate>> ratesForSourceType = new HashMap<Short, Set<CurrencyExchangeRate>>();
         for (CurrencyExchangeRate currencyExchangeRate : currencyExchangeRates)
         {
             Short sourceType = currencyExchangeRate.getSourceType();
-            if (!ratesForSourceType.containsKey(sourceType))
+            if (needToRecalculate.contains(sourceType))
             {
-                ratesForSourceType.put(sourceType, new HashSet<CurrencyExchangeRate>());
+                if (!ratesForSourceType.containsKey(sourceType))
+                {
+                    ratesForSourceType.put(sourceType,
+                            new HashSet<CurrencyExchangeRate>());
+                }
+                ratesForSourceType.get(sourceType).add(currencyExchangeRate);
             }
-            ratesForSourceType.get(sourceType).add(currencyExchangeRate);
         }
         
         for (Entry<Short, Set<CurrencyExchangeRate>> entry : ratesForSourceType.entrySet())
