@@ -21,18 +21,6 @@ public class CurrencyExchangeRateLogDAOImpl implements CurrencyExchangeRateLogDA
         sessionFactory.getCurrentSession().save(currencyExchangeRateLog);
     }
 
-    public void save(CurrencyExchangeRateLog currencyExchangeRate)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    public CurrencyExchangeRateLog load(Long currencyId, Short sourceType)
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     @SuppressWarnings("unchecked")
     public List<CurrencyExchangeRateLog> list()
     {

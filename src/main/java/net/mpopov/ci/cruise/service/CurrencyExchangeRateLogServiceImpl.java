@@ -24,20 +24,6 @@ public class CurrencyExchangeRateLogServiceImpl implements CurrencyExchangeRateL
     }
 
     @Transactional
-    public void save(CurrencyExchangeRateLog currencyExchangeRate)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Transactional
-    public CurrencyExchangeRateLog load(Long currencyId, Short sourceType)
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Transactional
     public List<CurrencyExchangeRateLog> list()
     {
         return currencyExchangeRateLogDAO.list();

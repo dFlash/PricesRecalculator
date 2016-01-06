@@ -8,10 +8,6 @@ public interface CurrencyExchangeRateLogDAO
 {
     public void add(CurrencyExchangeRateLog currencyExchangeRate);
 
-    public void save(CurrencyExchangeRateLog currencyExchangeRate);
-
-    public CurrencyExchangeRateLog load(Long currencyId, Short sourceType);
-
     public List<CurrencyExchangeRateLog> list();
 
     public void removeAll();

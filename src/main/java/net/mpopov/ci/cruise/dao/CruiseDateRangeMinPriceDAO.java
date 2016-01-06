@@ -6,18 +6,6 @@ import net.mpopov.ci.cruise.model.CruiseDateRangeMinPrice;
 
 public interface CruiseDateRangeMinPriceDAO
 {
-
-    public void add(CruiseDateRangeMinPrice cruiseDateRangeMinPrice);
-
-    public void save(CruiseDateRangeMinPrice cruiseDateRangeMinPrice);
-
-    public void remove(Long currencyId);
-
-    public List<CruiseDateRangeMinPrice> listCbrMinPrices(
-            List<Long> excludedCompanyIds);
-
-    public void removeByDateRange(Long cruiseDateRangeId);
-
     public List<CruiseDateRangeMinPrice> list(Short sourceType);
 
 }

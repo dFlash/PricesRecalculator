@@ -17,24 +17,6 @@ public class CurrencyExchangeRateServiceImpl
     private CurrencyExchangeRateDAO currencyExchangeRateDAO;
 
     @Transactional
-    public void add(CurrencyExchangeRate currencyExchangeRateExchangeRate)
-    {
-        currencyExchangeRateDAO.add(currencyExchangeRateExchangeRate);
-    }
-
-    @Transactional
-    public void save(CurrencyExchangeRate currencyExchangeRate)
-    {
-        currencyExchangeRateDAO.save(currencyExchangeRate);
-    }
-
-    @Transactional
-    public CurrencyExchangeRate load(Long currencyId, Short sourceType)
-    {
-        return currencyExchangeRateDAO.load(currencyId, sourceType);
-    }
-
-    @Transactional
     public List<CurrencyExchangeRate> list()
     {
         return currencyExchangeRateDAO.list();
