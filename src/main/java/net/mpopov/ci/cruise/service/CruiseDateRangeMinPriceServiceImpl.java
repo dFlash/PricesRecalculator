@@ -16,13 +16,11 @@ public class CruiseDateRangeMinPriceServiceImpl
 
     @Autowired
     private CruiseDateRangeMinPriceDAO cruiseDateRangeMinPriceDAO;
-    
+
     @Transactional
     public List<CruiseDateRangeMinPrice> list(Short sourceType)
     {
         return cruiseDateRangeMinPriceDAO.list(sourceType);
     }
-
-
 
 }

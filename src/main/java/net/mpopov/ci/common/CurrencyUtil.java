@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.mpopov.ci.cruise.model.CurrencyExchangeRate;
 
@@ -54,18 +53,19 @@ public class CurrencyUtil
         public static List<Long> getExcludedCbrCompanyIds()
         {
             List<Long> excludedCbrCompanyIds = new ArrayList<Long>();
-            for (EXCHANGE_RATE_SOURCE_TYPE type : EXCHANGE_RATE_SOURCE_TYPE.values())
+            for (EXCHANGE_RATE_SOURCE_TYPE type : EXCHANGE_RATE_SOURCE_TYPE
+                    .values())
             {
                 if (type != EXCHANGE_RATE_SOURCE_TYPE.CBR)
                 {
                     excludedCbrCompanyIds.add(type.getSourceType().longValue());
                 }
             }
-            return excludedCbrCompanyIds; 
+            return excludedCbrCompanyIds;
         }
 
     }
-    
+
     private static final char COMMA_SEPARATOR = ',';
 
     public static double getCurrencyRateValue(String valueString)
@@ -79,20 +79,23 @@ public class CurrencyUtil
 
         return currencyRateValue;
     }
-	
+
     /**
      * Retrieving prices for all currencies
      * 
-     * @param currency - base currency (from admin pane)
-     * @param price - price in base currency
-     * @param currencyExchangeRates - exchange rates for cruise
-     * @return collection with pairs (key - currency id, value - corresponding price)
+     * @param currency
+     *            - base currency (from admin pane)
+     * @param price
+     *            - price in base currency
+     * @param currencyExchangeRates
+     *            - exchange rates for cruise
+     * @return collection with pairs (key - currency id, value - corresponding
+     *         price)
      */
-    public static Map<Long, Double> getPricesByCurrencies(
-            Long currencyId, Double price,
-            Set<CurrencyExchangeRate> currencyExchangeRates)
+    public static Map<Long, Double> recalculatePriceValues(Long currencyId,
+            Double price, List<CurrencyExchangeRate> currencyExchangeRates)
     {
-    	Map<Long, Double> pricesByCurrencies = new HashMap<Long, Double>();
+        Map<Long, Double> pricesByCurrencies = new HashMap<Long, Double>();
         pricesByCurrencies.put(currencyId, price);
         Double baseCurrencyRate = null;
         for (CurrencyExchangeRate rate : currencyExchangeRates)
@@ -108,11 +111,12 @@ public class CurrencyUtil
         {
             if (!rate.getCurrencyId().equals(currencyId))
             {
-                Double currPrice = price * baseCurrencyRate / rate.getRateValue();
+                Double currPrice = price * baseCurrencyRate
+                        / rate.getRateValue();
                 pricesByCurrencies.put(rate.getCurrencyId(), currPrice);
             }
         }
-        
+
         return pricesByCurrencies;
     }
 

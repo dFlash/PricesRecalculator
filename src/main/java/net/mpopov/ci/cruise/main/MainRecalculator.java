@@ -19,7 +19,7 @@ public class MainRecalculator
     {
         log.info("Recalculation started");
         List<Recalculator> recalculators = getRecalculators();
-        
+
         boolean recalculated = false;
         for (Recalculator recalculator : recalculators)
         {
@@ -33,13 +33,13 @@ public class MainRecalculator
 
         log.info("Recalculation finished");
     }
-    
+
     private static List<Recalculator> getRecalculators()
     {
         List<Recalculator> recalculators = new ArrayList<Recalculator>();
         recalculators.add(new MinPriceRecalculator());
         recalculators.add(new PriceInfoRecalculator());
-        
+
         return recalculators;
     }
 }

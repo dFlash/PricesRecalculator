@@ -26,8 +26,7 @@ public class CruisePriceInfoDAOImpl implements CruisePriceInfoDAO
     {
         if (!cruiseDateRangeIds.isEmpty())
         {
-            String hql = " delete from CruisePriceInfo  " 
-                    + " where "
+            String hql = " delete from CruisePriceInfo  " + " where "
                     + " cruiseDateRange.cruiseDateRangeId in (:ñruiseDateRangeIds)";
             Query query = sessionFactory.getCurrentSession().createQuery(hql);
             query.setParameterList("ñruiseDateRangeIds", cruiseDateRangeIds);

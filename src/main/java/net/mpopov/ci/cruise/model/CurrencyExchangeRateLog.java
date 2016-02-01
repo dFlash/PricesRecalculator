@@ -20,7 +20,7 @@ public class CurrencyExchangeRateLog
 {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,
+    @GeneratedValue(strategy = GenerationType.AUTO,
             generator = "currency_exchange_rate_log_currency_exchange_rate_id_seq")
     @SequenceGenerator(
             name = "currency_exchange_rate_log_currency_exchange_rate_id_seq",
@@ -40,9 +40,6 @@ public class CurrencyExchangeRateLog
     @Column(name = "rate_value")
     @NotNull
     private Double rateValue;
-
-    @Column(name = "show_site")
-    private Boolean showSite;
 
     @Column(name = "for_currency_id")
     private Long forCurrencyId;
@@ -91,16 +88,6 @@ public class CurrencyExchangeRateLog
         this.rateValue = rateValue;
     }
 
-    public Boolean getShowSite()
-    {
-        return showSite;
-    }
-
-    public void setShowSite(Boolean showSite)
-    {
-        this.showSite = showSite;
-    }
-
     public Long getForCurrencyId()
     {
         return forCurrencyId;
@@ -127,56 +114,8 @@ public class CurrencyExchangeRateLog
         return "CurrencyExchangeRateLog [currencyExchangeRateLogId= "
                 + currencyExchangeRateLogId + ", dateTime=" + dateTime
                 + ", currencyId=" + currencyId + ", rateValue=" + rateValue
-                + ", showSite=" + showSite + ", forCurrencyId=" + forCurrencyId
-                + ", sourceType=" + sourceType + "]";
-    }
-
-    @Override
-    public int hashCode()
-    {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result
-                + ((currencyId == null) ? 0 : currencyId.hashCode());
-        result = prime * result
-                + ((forCurrencyId == null) ? 0 : forCurrencyId.hashCode());
-        result = prime * result
-                + ((sourceType == null) ? 0 : sourceType.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj)
-    {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        CurrencyExchangeRateLog other = (CurrencyExchangeRateLog) obj;
-        if (currencyId == null)
-        {
-            if (other.currencyId != null)
-                return false;
-        }
-        else if (!currencyId.equals(other.currencyId))
-            return false;
-        if (forCurrencyId == null)
-        {
-            if (other.forCurrencyId != null)
-                return false;
-        }
-        else if (!forCurrencyId.equals(other.forCurrencyId))
-            return false;
-        if (sourceType == null)
-        {
-            if (other.sourceType != null)
-                return false;
-        }
-        else if (!sourceType.equals(other.sourceType))
-            return false;
-        return true;
+                + ", forCurrencyId=" + forCurrencyId + ", sourceType="
+                + sourceType + "]";
     }
 
 }

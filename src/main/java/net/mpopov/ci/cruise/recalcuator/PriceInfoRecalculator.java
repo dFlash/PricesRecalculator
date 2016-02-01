@@ -1,18 +1,20 @@
 package net.mpopov.ci.cruise.recalcuator;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
-import java.util.Set;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
 
 import net.mpopov.ci.common.ContextAdapter;
 import net.mpopov.ci.common.CurrencyUtil;
 import net.mpopov.ci.cruise.model.CruiseCabinPrice;
+import net.mpopov.ci.cruise.model.CruiseDateRange;
 import net.mpopov.ci.cruise.model.CruisePriceInfo;
 import net.mpopov.ci.cruise.model.CurrencyExchangeRate;
 import net.mpopov.ci.cruise.model.CurrencyExchangeRateLog;
@@ -21,26 +23,29 @@ import net.mpopov.ci.cruise.service.CruisePriceInfoService;
 import net.mpopov.ci.cruise.service.CurrencyExchangeRateLogService;
 import net.mpopov.ci.cruise.service.CurrencyExchangeRateService;
 
-public class PriceInfoRecalculator extends ContextAdapter implements Recalculator
+public class PriceInfoRecalculator extends ContextAdapter
+        implements Recalculator
 {
     private static Logger log = Logger.getLogger(PriceInfoRecalculator.class);
 
-    private Set<Short> needToRecalculate = new HashSet<Short>();
-    
-    private List<CurrencyExchangeRate> currencyExchangeRates;
+    private ListMultimap<Short, CurrencyExchangeRate> filteredProcessedCurrencyExchangeRates = ArrayListMultimap
+            .create();
 
     public boolean recalculate()
     {
         log.info("PriceInfoRecalculator started");
         boolean recalculated = false;
-        init();
 
-        if (!needToRecalculate.isEmpty())
+        initialize();
+
+        if (!filteredProcessedCurrencyExchangeRates.isEmpty())
         {
             recalculatePricesInfo();
             recalculated = true;
         }
+
         log.info("PriceInfoRecalculator finished");
+
         return recalculated;
     }
 
@@ -50,155 +55,180 @@ public class PriceInfoRecalculator extends ContextAdapter implements Recalculato
                 "cruisePriceInfoService");
         CruiseCabinPriceService cruiseCabinPriceService = getBean(
                 "cruiseCabinPriceService");
+        for (Short sourceType : filteredProcessedCurrencyExchangeRates.keySet())
+        {
+            cruisePriceInfoService.remove(sourceType);
 
-        Map<Short, Set<CurrencyExchangeRate>> ratesForSourceType = new HashMap<Short, Set<CurrencyExchangeRate>>();
-        for (CurrencyExchangeRate currencyExchangeRate : currencyExchangeRates)
-        {
-            Short sourceType = currencyExchangeRate.getSourceType();
-            if (needToRecalculate.contains(sourceType))
+            List<CruiseCabinPrice> cruiseCabinPrices = cruiseCabinPriceService
+                    .list(sourceType);
+
+            for (CruiseCabinPrice cruiseCabinPrice : cruiseCabinPrices)
             {
-                if (!ratesForSourceType.containsKey(sourceType))
-                {
-                    ratesForSourceType.put(sourceType,
-                            new HashSet<CurrencyExchangeRate>());
-                }
-                ratesForSourceType.get(sourceType).add(currencyExchangeRate);
-            }
-        }
-        
-        for (Entry<Short, Set<CurrencyExchangeRate>> entry : ratesForSourceType.entrySet())
-        {
-            cruisePriceInfoService.remove(entry.getKey());
-            List<CruiseCabinPrice> cabinPrices = cruiseCabinPriceService
-                    .list(entry.getKey());
-            for (CruiseCabinPrice cabinPrice : cabinPrices)
-            {
-                Map<Long, Double> prices = CurrencyUtil.getPricesByCurrencies(
-                        cabinPrice.getCruisePrice().getCurrency().getCurrencyId(),
-                        cabinPrice.getPriceValue().doubleValue(),
-                        entry.getValue());
-                Map<Long, Double> pricesPortAdult = CurrencyUtil.getPricesByCurrencies(
-                        cabinPrice.getCruisePrice().getCurrency().getCurrencyId(),
-                        cabinPrice.getPricePortAdult() == null ? 0.0 : cabinPrice.getPricePortAdult().doubleValue(),
-                        entry.getValue());
-                Map<Long, Double> pricesPortChild = CurrencyUtil.getPricesByCurrencies(
-                        cabinPrice.getCruisePrice().getCurrency().getCurrencyId(),
-                        cabinPrice.getPricePortChild() == null ? 0.0 :cabinPrice.getPricePortChild().doubleValue(),
-                        entry.getValue());
+                List<CurrencyExchangeRate> currencyExchangeRates = filteredProcessedCurrencyExchangeRates
+                        .get(sourceType);
+
+                Long currencyId = cruiseCabinPrice.getCruisePrice()
+                        .getCurrency().getCurrencyId();
+
+                Map<Long, Double> priceValues = CurrencyUtil
+                        .recalculatePriceValues(currencyId,
+                                getPriceValue(cruiseCabinPrice.getPriceValue()),
+                                currencyExchangeRates);
+
+                Map<Long, Double> pricesPortAdult = CurrencyUtil
+                        .recalculatePriceValues(currencyId,
+                                getPriceValue(
+                                        cruiseCabinPrice.getPricePortAdult()),
+                                currencyExchangeRates);
+
+                Map<Long, Double> pricesPortChild = CurrencyUtil
+                        .recalculatePriceValues(currencyId,
+                                getPriceValue(
+                                        cruiseCabinPrice.getPricePortChild()),
+                                currencyExchangeRates);
+
                 Map<Long, Double> pricesValueOne = CurrencyUtil
-                        .getPricesByCurrencies(
-                                cabinPrice.getCruisePrice().getCurrency()
-                                        .getCurrencyId(),
-                                cabinPrice.getPriceValueOne() == null ? 0.0
-                                        : cabinPrice.getPriceValueOne()
-                                                .doubleValue(),
-                                entry.getValue());
+                        .recalculatePriceValues(currencyId,
+                                getPriceValue(
+                                        cruiseCabinPrice.getPriceValueOne()),
+                                currencyExchangeRates);
+
                 Map<Long, Double> pricesValueTwo = CurrencyUtil
-                        .getPricesByCurrencies(
-                                cabinPrice.getCruisePrice().getCurrency()
-                                        .getCurrencyId(),
-                                cabinPrice.getPriceValueTwo() == null ? 0.0
-                                        : cabinPrice.getPriceValueTwo()
-                                                .doubleValue(),
-                                entry.getValue());
+                        .recalculatePriceValues(currencyId,
+                                getPriceValue(
+                                        cruiseCabinPrice.getPriceValueTwo()),
+                                currencyExchangeRates);
+
                 Map<Long, Double> pricesValueThree = CurrencyUtil
-                        .getPricesByCurrencies(
-                                cabinPrice.getCruisePrice().getCurrency()
-                                        .getCurrencyId(),
-                                cabinPrice.getPriceValueThree() == null ? 0.0
-                                        : cabinPrice.getPriceValueThree()
-                                                .doubleValue(),
-                                entry.getValue());
+                        .recalculatePriceValues(currencyId,
+                                getPriceValue(
+                                        cruiseCabinPrice.getPriceValueThree()),
+                                currencyExchangeRates);
+
                 Map<Long, Double> pricesValueFour = CurrencyUtil
-                        .getPricesByCurrencies(
-                                cabinPrice.getCruisePrice().getCurrency()
-                                        .getCurrencyId(),
-                                cabinPrice.getPriceValueFour() == null ? 0.0
-                                        : cabinPrice.getPriceValueFour()
-                                                .doubleValue(),
-                                entry.getValue());
+                        .recalculatePriceValues(currencyId,
+                                getPriceValue(
+                                        cruiseCabinPrice.getPriceValueFour()),
+                                currencyExchangeRates);
+
                 Map<Long, Double> pricesValueAddChild = CurrencyUtil
-                        .getPricesByCurrencies(
-                                cabinPrice.getCruisePrice().getCurrency()
-                                        .getCurrencyId(),
-                                cabinPrice.getPriceValueAddChild() == null ? 0.0
-                                        : cabinPrice.getPriceValueAddChild()
-                                                .doubleValue(),
-                                entry.getValue());
+                        .recalculatePriceValues(currencyId,
+                                getPriceValue(cruiseCabinPrice
+                                        .getPriceValueAddChild()),
+                                currencyExchangeRates);
+
                 Map<Long, Double> pricesValueAdd2Child = CurrencyUtil
-                        .getPricesByCurrencies(
-                                cabinPrice.getCruisePrice().getCurrency()
-                                        .getCurrencyId(),
-                                cabinPrice.getPriceValueAdd2Child() == null ? 0.0
-                                        : cabinPrice.getPriceValueAdd2Child()
-                                                .doubleValue(),
-                                entry.getValue());
+                        .recalculatePriceValues(currencyId,
+                                getPriceValue(cruiseCabinPrice
+                                        .getPriceValueAdd2Child()),
+                                currencyExchangeRates);
 
-                for (Entry<Long, Double> price : prices.entrySet())
+                List<CruisePriceInfo> cruisePriceInfos = Lists.newArrayList();
+                for (Entry<Long, Double> priceValue : priceValues.entrySet())
                 {
-                    CruisePriceInfo cruisePriceInfo = new CruisePriceInfo();
-                    cruisePriceInfo.setCruiseDateRange(cabinPrice.getCruisePrice().getCruiseDateRange());
-                    cruisePriceInfo.setCabinId(cabinPrice.getCabinId());
-                    cruisePriceInfo.setCruisePriceId(cabinPrice.getCruisePrice().getCruisePriceId());
-                    cruisePriceInfo.setCurrencyId(price.getKey());
-                    cruisePriceInfo.setDateTime(cabinPrice.getCruisePrice().getDateTime());
-                    cruisePriceInfo.setPricePortAdult(pricesPortAdult.get(price.getKey()));
-                    cruisePriceInfo.setPricePortChild(pricesPortChild.get(price.getKey()));
-                    cruisePriceInfo.setPriceValue(prices.get(price.getKey()));
-                    cruisePriceInfo.setPriceValueAdd2Child(pricesValueAdd2Child.get(price.getKey()));
-                    cruisePriceInfo.setPriceValueAddChild(pricesValueAddChild.get(price.getKey()));
-                    cruisePriceInfo.setPriceValueOne(pricesValueOne.get(price.getKey()));
-                    cruisePriceInfo.setPriceValueTwo(pricesValueTwo.get(price.getKey()));
-                    cruisePriceInfo.setPriceValueThree(pricesValueThree.get(price.getKey()));
-                    cruisePriceInfo.setPriceValueFour(pricesValueFour.get(price.getKey()));
-                    cruisePriceInfoService.add(cruisePriceInfo);
+                    CruiseDateRange cruiseDateRange = cruiseCabinPrice
+                            .getCruisePrice().getCruiseDateRange();
+                    Long cabinId = cruiseCabinPrice.getCabinId();
+                    Long cruisePriceId = cruiseCabinPrice.getCruisePrice()
+                            .getCruisePriceId();
+                    Date dateTime = cruiseCabinPrice.getCruisePrice()
+                            .getDateTime();
+                    Long priceVaueCurrency = priceValue.getKey();
 
+                    CruisePriceInfo cruisePriceInfo = new CruisePriceInfo();
+                    cruisePriceInfo.setCruiseDateRange(cruiseDateRange);
+                    cruisePriceInfo.setCabinId(cabinId);
+                    cruisePriceInfo.setCruisePriceId(cruisePriceId);
+                    cruisePriceInfo.setCurrencyId(priceVaueCurrency);
+                    cruisePriceInfo.setDateTime(dateTime);
+
+                    Double currentPriceValue = priceValues
+                            .get(priceVaueCurrency);
+                    Double pricePortAdult = pricesPortAdult
+                            .get(priceVaueCurrency);
+                    Double pricePortChild = pricesPortChild
+                            .get(priceVaueCurrency);
+                    Double priceValueAdd2Child = pricesValueAdd2Child
+                            .get(priceVaueCurrency);
+                    Double priceValueAddChild = pricesValueAddChild
+                            .get(priceVaueCurrency);
+                    Double priceValueOne = pricesValueOne
+                            .get(priceVaueCurrency);
+                    Double priceValueTwo = pricesValueTwo
+                            .get(priceVaueCurrency);
+                    Double priceValueThree = pricesValueThree
+                            .get(priceVaueCurrency);
+                    Double priceValueFour = pricesValueFour
+                            .get(priceVaueCurrency);
+
+                    cruisePriceInfo.setPriceValue(currentPriceValue);
+                    cruisePriceInfo.setPricePortAdult(pricePortAdult);
+                    cruisePriceInfo.setPricePortChild(pricePortChild);
+                    cruisePriceInfo.setPriceValueAdd2Child(priceValueAdd2Child);
+                    cruisePriceInfo.setPriceValueAddChild(priceValueAddChild);
+                    cruisePriceInfo.setPriceValueOne(priceValueOne);
+                    cruisePriceInfo.setPriceValueTwo(priceValueTwo);
+                    cruisePriceInfo.setPriceValueThree(priceValueThree);
+                    cruisePriceInfo.setPriceValueFour(priceValueFour);
+
+                    cruisePriceInfos.add(cruisePriceInfo);
                 }
+
+                cruisePriceInfoService.add(cruisePriceInfos);
             }
         }
-        
     }
 
-    private void init()
+    private Double getPriceValue(Number priceValue)
+    {
+        return priceValue == null ? 0.0 : priceValue.doubleValue();
+    }
+
+    private void initialize()
     {
         CurrencyExchangeRateService currencyExchangeRateService = getBean(
                 "currencyExchangeRateService");
-        currencyExchangeRates = currencyExchangeRateService
+        List<CurrencyExchangeRate> currencyExchangeRates = currencyExchangeRateService
                 .list();
 
         CurrencyExchangeRateLogService currencyExchangeRateLogService = getBean(
                 "currencyExchangeRateLogService");
         List<CurrencyExchangeRateLog> currencyExchangeLogRates = currencyExchangeRateLogService
                 .list();
-        
-        for (CurrencyExchangeRateLog currencyExchangeRateLog : currencyExchangeLogRates)
+
+        for (CurrencyExchangeRate currencyExchangeRate : currencyExchangeRates)
         {
-            CurrencyExchangeRate currCurrencyExchangeRate = new CurrencyExchangeRate();
-            currCurrencyExchangeRate
-                    .setCurrencyId(currencyExchangeRateLog.getCurrencyId());
-            currCurrencyExchangeRate.setForCurrencyId(
-                    currencyExchangeRateLog.getForCurrencyId());
-            currCurrencyExchangeRate
-                    .setSourceType(currencyExchangeRateLog.getSourceType());
-            for (CurrencyExchangeRate currencyExchangeRate : currencyExchangeRates)
+            boolean isExists = false;
+            for (CurrencyExchangeRateLog currencyExchangeRateLog : currencyExchangeLogRates)
             {
-                CurrencyExchangeRateLog currCurrencyExchangeRateLog = new CurrencyExchangeRateLog();
-                currCurrencyExchangeRateLog
-                        .setCurrencyId(currencyExchangeRate.getCurrencyId());
-                currCurrencyExchangeRateLog.setForCurrencyId(
-                        currencyExchangeRate.getForCurrencyId());
-                currCurrencyExchangeRateLog
-                        .setSourceType(currencyExchangeRate.getSourceType());
-                if ((currCurrencyExchangeRateLog.equals(currencyExchangeRateLog)
-                        && !currencyExchangeRate.getDateTime()
-                                .equals(currencyExchangeRateLog.getDateTime()))
-                        || !currencyExchangeLogRates
-                                .contains(currCurrencyExchangeRateLog)
-                        || !currencyExchangeRates
-                                .contains(currCurrencyExchangeRate))
+                boolean isEqual = currencyExchangeRateLog
+                        .getSourceType() == currencyExchangeRate
+                                .getSourceType();
+                isEqual &= currencyExchangeRateLog
+                        .getCurrencyId() == currencyExchangeRate
+                                .getCurrencyId();
+                isEqual &= currencyExchangeRateLog
+                        .getForCurrencyId() == currencyExchangeRate
+                                .getForCurrencyId();
+                isEqual &= currencyExchangeRateLog
+                        .getForCurrencyId() == currencyExchangeRate
+                                .getForCurrencyId();
+                isEqual &= currencyExchangeRateLog
+                        .getDateTime() == currencyExchangeRate.getDateTime();
+                isEqual &= currencyExchangeRateLog
+                        .getRateValue() == currencyExchangeRate.getRateValue();
+                if (isEqual)
                 {
-                    needToRecalculate.add(currencyExchangeRate.getSourceType());
+                    isExists = true;
+                    break;
                 }
+            }
+
+            if (!isExists)
+            {
+                filteredProcessedCurrencyExchangeRates.put(
+                        currencyExchangeRate.getSourceType(),
+                        currencyExchangeRate);
             }
         }
     }

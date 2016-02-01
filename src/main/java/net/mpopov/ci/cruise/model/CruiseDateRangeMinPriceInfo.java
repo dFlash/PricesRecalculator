@@ -15,10 +15,6 @@ import javax.validation.constraints.NotNull;
 @Table(name = "public.cruise_date_range_min_price_info")
 public class CruiseDateRangeMinPriceInfo implements Serializable
 {
-
-    /**
-     * 
-     */
     private static final long serialVersionUID = 8521386199879324557L;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
@@ -26,6 +22,7 @@ public class CruiseDateRangeMinPriceInfo implements Serializable
     @NotNull
     private CruiseDateRange cruiseDateRange;
 
+    @Id
     @Column(name = "currency_id")
     @NotNull
     private Long currencyId;

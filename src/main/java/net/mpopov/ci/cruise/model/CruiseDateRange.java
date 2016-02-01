@@ -139,15 +139,12 @@ public class CruiseDateRange
         this.cruise = cruise;
     }
 
-
-
     @Override
     public String toString()
     {
         return "CruiseDateRange [cruiseDateRangeId=" + cruiseDateRangeId
                 + ", beginDate=" + beginDate + ", endDate=" + endDate
-                + ", cruise=" + cruise + ", startSityId=" + startSityId
-                + "]";
+                + ", cruise=" + cruise + ", startSityId=" + startSityId + "]";
     }
 
 }

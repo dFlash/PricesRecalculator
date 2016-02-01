@@ -45,15 +45,17 @@ public class Company
     @Column(name = "gallery_id")
     private Long gallery;
 
-	public Long getCompanyCruiseCategory() {
-		return companyCruiseCategory;
-	}
+    public Long getCompanyCruiseCategory()
+    {
+        return companyCruiseCategory;
+    }
 
-	public void setCompanyCruiseCategory(Long companyCruiseCategory) {
-		this.companyCruiseCategory = companyCruiseCategory;
-	}
+    public void setCompanyCruiseCategory(Long companyCruiseCategory)
+    {
+        this.companyCruiseCategory = companyCruiseCategory;
+    }
 
-	/**
+    /**
      * @return the companyId
      */
     public Long getCompanyId()

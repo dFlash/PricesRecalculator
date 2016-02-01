@@ -61,7 +61,6 @@ public class Cruise
     @Column(name = "region_id")
     private Long region;
 
-
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "currency_id")
     @NotNull
@@ -104,35 +103,42 @@ public class Cruise
     @Column(name = "is_disabled_ua")
     private Boolean isDisabledUa;
 
-    public Boolean getIsDisabledRu() {
-		return isDisabledRu;
-	}
+    public Boolean getIsDisabledRu()
+    {
+        return isDisabledRu;
+    }
 
-	public void setIsDisabledRu(Boolean isDisabledRu) {
-		this.isDisabledRu = isDisabledRu;
-	}
+    public void setIsDisabledRu(Boolean isDisabledRu)
+    {
+        this.isDisabledRu = isDisabledRu;
+    }
 
-	public Boolean getIsDisabledUa() {
-		return isDisabledUa;
-	}
+    public Boolean getIsDisabledUa()
+    {
+        return isDisabledUa;
+    }
 
-	public void setIsDisabledUa(Boolean isDisabledUa) {
-		this.isDisabledUa = isDisabledUa;
-	}
+    public void setIsDisabledUa(Boolean isDisabledUa)
+    {
+        this.isDisabledUa = isDisabledUa;
+    }
 
-	public Boolean getIsDisabled() {
-		return isDisabled;
-	}
+    public Boolean getIsDisabled()
+    {
+        return isDisabled;
+    }
 
-	public void setIsDisabled(Boolean isDisabled) {
-		this.isDisabled = isDisabled;
-	}
+    public void setIsDisabled(Boolean isDisabled)
+    {
+        this.isDisabled = isDisabled;
+    }
 
-	public void setSimpleDescription(boolean isSimpleDescription) {
-		this.isSimpleDescription = isSimpleDescription;
-	}
+    public void setSimpleDescription(boolean isSimpleDescription)
+    {
+        this.isSimpleDescription = isSimpleDescription;
+    }
 
-	/**
+    /**
      * @return the cruiseId
      */
     public Long getCruiseId()
@@ -229,8 +235,7 @@ public class Cruise
      * @param cruiseLanguageService
      *            the cruiseLanguageService to set
      */
-    public void setCruiseLanguageService(
-    		Long cruiseLanguageService)
+    public void setCruiseLanguageService(Long cruiseLanguageService)
     {
         this.cruiseLanguageService = cruiseLanguageService;
     }

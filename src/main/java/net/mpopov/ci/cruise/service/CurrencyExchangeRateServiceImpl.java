@@ -22,10 +22,4 @@ public class CurrencyExchangeRateServiceImpl
         return currencyExchangeRateDAO.list();
     }
 
-    @Override
-    public String toString()
-    {
-        return "CurrencyExchangeRateServiceImpl [for test]";
-    }
-
 }

@@ -11,29 +11,38 @@ public class CurrencyExchangeRateLogUtil extends ContextAdapter
 {
     public void saveCurrencyExchangeRates()
     {
-        CurrencyExchangeRateLogService currencyExchangeRateLogService = getBean("currencyExchangeRateLogService");
+        CurrencyExchangeRateLogService currencyExchangeRateLogService = getBean(
+                "currencyExchangeRateLogService");
         currencyExchangeRateLogService.removeAll();
-        
-        CurrencyExchangeRateService currencyExchangeRateService = getBean("currencyExchangeRateService");
-        List<CurrencyExchangeRate> currencyExchangeRates = currencyExchangeRateService.list();
+
+        CurrencyExchangeRateService currencyExchangeRateService = getBean(
+                "currencyExchangeRateService");
+        List<CurrencyExchangeRate> currencyExchangeRates = currencyExchangeRateService
+                .list();
         for (CurrencyExchangeRate currencyExchangeRate : currencyExchangeRates)
         {
-            CurrencyExchangeRateLog currencyExchangeRateLog = createCurrencyExchangeRateLog(currencyExchangeRate);
+            CurrencyExchangeRateLog currencyExchangeRateLog = createCurrencyExchangeRateLog(
+                    currencyExchangeRate);
             currencyExchangeRateLogService.add(currencyExchangeRateLog);
         }
     }
-    
-    private CurrencyExchangeRateLog createCurrencyExchangeRateLog(CurrencyExchangeRate currencyExchangeRate)
+
+    private CurrencyExchangeRateLog createCurrencyExchangeRateLog(
+            CurrencyExchangeRate currencyExchangeRate)
     {
         CurrencyExchangeRateLog currencyExchangeRateLog = new CurrencyExchangeRateLog();
-        currencyExchangeRateLog.setCurrencyExchangeRateLogId(currencyExchangeRate.getCurrencyExchangeRateId());
-        currencyExchangeRateLog.setCurrencyId(currencyExchangeRate.getCurrencyId());
+        currencyExchangeRateLog.setCurrencyExchangeRateLogId(
+                currencyExchangeRate.getCurrencyExchangeRateId());
+        currencyExchangeRateLog
+                .setCurrencyId(currencyExchangeRate.getCurrencyId());
         currencyExchangeRateLog.setDateTime(currencyExchangeRate.getDateTime());
-        currencyExchangeRateLog.setForCurrencyId(currencyExchangeRate.getForCurrencyId());
-        currencyExchangeRateLog.setRateValue(currencyExchangeRate.getRateValue());
-        currencyExchangeRateLog.setShowSite(currencyExchangeRate.getShowSite());
-        currencyExchangeRateLog.setSourceType(currencyExchangeRate.getSourceType());
-        
+        currencyExchangeRateLog
+                .setForCurrencyId(currencyExchangeRate.getForCurrencyId());
+        currencyExchangeRateLog
+                .setRateValue(currencyExchangeRate.getRateValue());
+        currencyExchangeRateLog
+                .setSourceType(currencyExchangeRate.getSourceType());
+
         return currencyExchangeRateLog;
     }
 

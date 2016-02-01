@@ -82,7 +82,7 @@ public class CruiseDateRangeMinPrice
     {
         this.cruiseDateRange = cruiseDateRange;
     }
-    
+
     @Override
     public String toString()
     {

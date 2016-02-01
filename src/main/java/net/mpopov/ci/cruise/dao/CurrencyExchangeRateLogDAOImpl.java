@@ -10,9 +10,10 @@ import org.springframework.stereotype.Repository;
 import net.mpopov.ci.cruise.model.CurrencyExchangeRateLog;
 
 @Repository
-public class CurrencyExchangeRateLogDAOImpl implements CurrencyExchangeRateLogDAO
+public class CurrencyExchangeRateLogDAOImpl
+        implements CurrencyExchangeRateLogDAO
 {
-    
+
     @Autowired
     private SessionFactory sessionFactory;
 

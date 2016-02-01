@@ -41,9 +41,6 @@ public class CurrencyExchangeRate
     @NotNull
     private Double rateValue;
 
-    @Column(name = "show_site")
-    private Boolean showSite;
-
     @Column(name = "for_currency_id")
     private Long forCurrencyId;
 
@@ -91,16 +88,6 @@ public class CurrencyExchangeRate
         this.rateValue = rateValue;
     }
 
-    public Boolean getShowSite()
-    {
-        return showSite;
-    }
-
-    public void setShowSite(Boolean showSite)
-    {
-        this.showSite = showSite;
-    }
-
     public Long getForCurrencyId()
     {
         return forCurrencyId;
@@ -127,58 +114,8 @@ public class CurrencyExchangeRate
         return "CurrencyExchangeRate [currencyExchangeRateId="
                 + currencyExchangeRateId + ", dateTime=" + dateTime
                 + ", currencyId=" + currencyId + ", rateValue=" + rateValue
-                + ", showSite=" + showSite + ", forCurrencyId=" + forCurrencyId
-                + ", sourceType=" + sourceType + "]";
+                + ", forCurrencyId=" + forCurrencyId + ", sourceType="
+                + sourceType + "]";
     }
-
-    @Override
-    public int hashCode()
-    {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result
-                + ((currencyId == null) ? 0 : currencyId.hashCode());
-        result = prime * result
-                + ((forCurrencyId == null) ? 0 : forCurrencyId.hashCode());
-        result = prime * result
-                + ((sourceType == null) ? 0 : sourceType.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj)
-    {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        CurrencyExchangeRate other = (CurrencyExchangeRate) obj;
-        if (currencyId == null)
-        {
-            if (other.currencyId != null)
-                return false;
-        }
-        else if (!currencyId.equals(other.currencyId))
-            return false;
-        if (forCurrencyId == null)
-        {
-            if (other.forCurrencyId != null)
-                return false;
-        }
-        else if (!forCurrencyId.equals(other.forCurrencyId))
-            return false;
-        if (sourceType == null)
-        {
-            if (other.sourceType != null)
-                return false;
-        }
-        else if (!sourceType.equals(other.sourceType))
-            return false;
-        return true;
-    }
-    
-    
 
 }

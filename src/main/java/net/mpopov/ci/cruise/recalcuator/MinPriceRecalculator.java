@@ -1,13 +1,14 @@
 package net.mpopov.ci.cruise.recalcuator;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
 
 import net.mpopov.ci.common.ContextAdapter;
 import net.mpopov.ci.common.CurrencyUtil;
@@ -24,22 +25,25 @@ public class MinPriceRecalculator extends ContextAdapter implements Recalculator
 {
     private static Logger log = Logger.getLogger(MinPriceRecalculator.class);
 
-    private Set<Short> needToRecalculate = new HashSet<Short>();
-    
-    private List<CurrencyExchangeRate> currencyExchangeRates;
+    private boolean recalculated;
+
+    private ListMultimap<Short, CurrencyExchangeRate> filteredProcessedCurrencyExchangeRates = ArrayListMultimap
+            .create();
 
     public boolean recalculate()
     {
-        log.info("MinPriceRecalculator started");
-        boolean recalculated = false;
-        init();
+        log.info("MinPriceRecalculator started.");
 
-        if (!needToRecalculate.isEmpty())
+        initialize();
+
+        if (!filteredProcessedCurrencyExchangeRates.isEmpty())
         {
             recalculateMinPrices();
             recalculated = true;
         }
-        log.info("MinPriceRecalculator finished");
+
+        log.info("MinPriceRecalculator finished.");
+
         return recalculated;
     }
 
@@ -50,86 +54,96 @@ public class MinPriceRecalculator extends ContextAdapter implements Recalculator
         CruiseDateRangeMinPriceService cruiseDateRangeMinPriceService = getBean(
                 "cruiseDateRangeMinPriceService");
 
-        Map<Short, Set<CurrencyExchangeRate>> ratesForSourceType = new HashMap<Short, Set<CurrencyExchangeRate>>();
-        for (CurrencyExchangeRate currencyExchangeRate : currencyExchangeRates)
+        for (Short sourceType : filteredProcessedCurrencyExchangeRates.keySet())
         {
-            Short sourceType = currencyExchangeRate.getSourceType();
-            if (needToRecalculate.contains(sourceType))
+            cruiseDateRangeMinPriceInfoService.remove(sourceType);
+
+            List<CruiseDateRangeMinPrice> cruiseDateRangeMinPrices = cruiseDateRangeMinPriceService
+                    .list(sourceType);
+
+            for (CruiseDateRangeMinPrice cruiseDateRangeMinPrice : cruiseDateRangeMinPrices)
             {
-                if (!ratesForSourceType.containsKey(sourceType))
-                {
-                    ratesForSourceType.put(sourceType,
-                            new HashSet<CurrencyExchangeRate>());
-                }
-                ratesForSourceType.get(sourceType).add(currencyExchangeRate);
-            }
-        }
-        
-        for (Entry<Short, Set<CurrencyExchangeRate>> entry : ratesForSourceType.entrySet())
-        {
-            cruiseDateRangeMinPriceInfoService.remove(entry.getKey());
-            List<CruiseDateRangeMinPrice> minPrices = cruiseDateRangeMinPriceService
-                    .list(entry.getKey());
-            for (CruiseDateRangeMinPrice cruiseDateRangeMinPrice : minPrices)
-            {
-                Map<Long, Double> prices = CurrencyUtil.getPricesByCurrencies(
-                        cruiseDateRangeMinPrice.getCurrency().getCurrencyId(),
-                        cruiseDateRangeMinPrice.getMinPriceValue(),
-                        entry.getValue());
-                for (Entry<Long, Double> price : prices.entrySet())
+                Long currencyId = cruiseDateRangeMinPrice.getCurrency()
+                        .getCurrencyId();
+                Double minPriceValue = cruiseDateRangeMinPrice
+                        .getMinPriceValue();
+                List<CurrencyExchangeRate> currencyExchangeRates = filteredProcessedCurrencyExchangeRates
+                        .get(sourceType);
+
+                Map<Long, Double> currencyToRecalculatedPriceValues = CurrencyUtil
+                        .recalculatePriceValues(currencyId, minPriceValue,
+                                currencyExchangeRates);
+
+                List<CruiseDateRangeMinPriceInfo> cruiseDateRangeMinPriceInfos = Lists
+                        .newArrayList();
+                for (Entry<Long, Double> currencyToRecalculatedPriceValue : currencyToRecalculatedPriceValues
+                        .entrySet())
                 {
                     CruiseDateRangeMinPriceInfo cruiseDateRangeMinPriceInfo = new CruiseDateRangeMinPriceInfo();
-                    cruiseDateRangeMinPriceInfo.setCruiseDateRange(cruiseDateRangeMinPrice.getCruiseDateRange());
-                    cruiseDateRangeMinPriceInfo.setCruiseDateRangeMinPrice(cruiseDateRangeMinPrice);
-                    cruiseDateRangeMinPriceInfo.setCurrencyId(price.getKey());
-                    cruiseDateRangeMinPriceInfo.setPriceValue(price.getValue());
-                    cruiseDateRangeMinPriceInfoService.add(cruiseDateRangeMinPriceInfo);
+                    cruiseDateRangeMinPriceInfo.setCruiseDateRange(
+                            cruiseDateRangeMinPrice.getCruiseDateRange());
+                    cruiseDateRangeMinPriceInfo.setCruiseDateRangeMinPrice(
+                            cruiseDateRangeMinPrice);
+                    cruiseDateRangeMinPriceInfo.setCurrencyId(
+                            currencyToRecalculatedPriceValue.getKey());
+                    cruiseDateRangeMinPriceInfo.setPriceValue(
+                            currencyToRecalculatedPriceValue.getValue());
+
+                    cruiseDateRangeMinPriceInfos
+                            .add(cruiseDateRangeMinPriceInfo);
                 }
+
+                cruiseDateRangeMinPriceInfoService
+                        .add(cruiseDateRangeMinPriceInfos);
             }
         }
-        
     }
 
-    private void init()
+    private void initialize()
     {
         CurrencyExchangeRateService currencyExchangeRateService = getBean(
                 "currencyExchangeRateService");
-        currencyExchangeRates = currencyExchangeRateService
+        List<CurrencyExchangeRate> currencyExchangeRates = currencyExchangeRateService
                 .list();
 
         CurrencyExchangeRateLogService currencyExchangeRateLogService = getBean(
                 "currencyExchangeRateLogService");
         List<CurrencyExchangeRateLog> currencyExchangeLogRates = currencyExchangeRateLogService
                 .list();
-        
-        for (CurrencyExchangeRateLog currencyExchangeRateLog : currencyExchangeLogRates)
+
+        for (CurrencyExchangeRate currencyExchangeRate : currencyExchangeRates)
         {
-            CurrencyExchangeRate currCurrencyExchangeRate = new CurrencyExchangeRate();
-            currCurrencyExchangeRate
-                    .setCurrencyId(currencyExchangeRateLog.getCurrencyId());
-            currCurrencyExchangeRate.setForCurrencyId(
-                    currencyExchangeRateLog.getForCurrencyId());
-            currCurrencyExchangeRate
-                    .setSourceType(currencyExchangeRateLog.getSourceType());
-            for (CurrencyExchangeRate currencyExchangeRate : currencyExchangeRates)
+            boolean isExists = false;
+            for (CurrencyExchangeRateLog currencyExchangeRateLog : currencyExchangeLogRates)
             {
-                CurrencyExchangeRateLog currCurrencyExchangeRateLog = new CurrencyExchangeRateLog();
-                currCurrencyExchangeRateLog
-                        .setCurrencyId(currencyExchangeRate.getCurrencyId());
-                currCurrencyExchangeRateLog.setForCurrencyId(
-                        currencyExchangeRate.getForCurrencyId());
-                currCurrencyExchangeRateLog
-                        .setSourceType(currencyExchangeRate.getSourceType());
-                if ((currCurrencyExchangeRateLog.equals(currencyExchangeRateLog)
-                        && !currencyExchangeRate.getDateTime()
-                                .equals(currencyExchangeRateLog.getDateTime()))
-                        || !currencyExchangeLogRates
-                                .contains(currCurrencyExchangeRateLog)
-                        || !currencyExchangeRates
-                                .contains(currCurrencyExchangeRate))
+                boolean isEqual = currencyExchangeRateLog
+                        .getSourceType() == currencyExchangeRate
+                                .getSourceType();
+                isEqual &= currencyExchangeRateLog
+                        .getCurrencyId() == currencyExchangeRate
+                                .getCurrencyId();
+                isEqual &= currencyExchangeRateLog
+                        .getForCurrencyId() == currencyExchangeRate
+                                .getForCurrencyId();
+                isEqual &= currencyExchangeRateLog
+                        .getForCurrencyId() == currencyExchangeRate
+                                .getForCurrencyId();
+                isEqual &= currencyExchangeRateLog
+                        .getDateTime() == currencyExchangeRate.getDateTime();
+                isEqual &= currencyExchangeRateLog
+                        .getRateValue() == currencyExchangeRate.getRateValue();
+                if (isEqual)
                 {
-                    needToRecalculate.add(currencyExchangeRate.getSourceType());
+                    isExists = true;
+                    break;
                 }
+            }
+
+            if (!isExists)
+            {
+                filteredProcessedCurrencyExchangeRates.put(
+                        currencyExchangeRate.getSourceType(),
+                        currencyExchangeRate);
             }
         }
     }

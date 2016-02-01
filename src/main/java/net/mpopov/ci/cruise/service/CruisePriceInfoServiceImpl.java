@@ -1,5 +1,7 @@
 package net.mpopov.ci.cruise.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,16 +19,23 @@ public class CruisePriceInfoServiceImpl implements CruisePriceInfoService
     @Transactional
     public void remove(Short sourceType)
     {
-        cruisePriceInfoDAO.remove(cruisePriceInfoDAO
-                .listCruiseDateRangeIds(sourceType));
-        
+        cruisePriceInfoDAO
+                .remove(cruisePriceInfoDAO.listCruiseDateRangeIds(sourceType));
     }
 
     @Transactional
     public void add(CruisePriceInfo cruisePriceInfo)
     {
         cruisePriceInfoDAO.add(cruisePriceInfo);
-        
+    }
+
+    @Transactional
+    public void add(List<CruisePriceInfo> cruisePriceInfos)
+    {
+        for (CruisePriceInfo cruisePriceInfo : cruisePriceInfos)
+        {
+            cruisePriceInfoDAO.add(cruisePriceInfo);
+        }
     }
 
 }

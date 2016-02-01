@@ -19,9 +19,6 @@ import org.springframework.format.annotation.DateTimeFormat.ISO;
 @Table(name = "public.cruise_price_info")
 public class CruisePriceInfo implements Serializable
 {
-    /**
-     * 
-     */
     private static final long serialVersionUID = 6875128399096431256L;
 
     @Id

@@ -10,7 +10,8 @@ import net.mpopov.ci.cruise.dao.CurrencyExchangeRateLogDAO;
 import net.mpopov.ci.cruise.model.CurrencyExchangeRateLog;
 
 @Service("currencyExchangeRateLogService")
-public class CurrencyExchangeRateLogServiceImpl implements CurrencyExchangeRateLogService
+public class CurrencyExchangeRateLogServiceImpl
+        implements CurrencyExchangeRateLogService
 {
 
     @Autowired
@@ -20,7 +21,7 @@ public class CurrencyExchangeRateLogServiceImpl implements CurrencyExchangeRateL
     public void add(CurrencyExchangeRateLog currencyExchangeRateLog)
     {
         currencyExchangeRateLogDAO.add(currencyExchangeRateLog);
-        
+
     }
 
     @Transactional
